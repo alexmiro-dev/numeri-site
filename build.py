@@ -42,5 +42,5 @@ def conv(md, title, lang, upd):
             f'<meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>\n'
             f'<style>{CSS}</style></head>\n<body><h1>{title}</h1>{"".join(out)}'
             '<p><a href="./">Português</a> · <a href="es.html">Español</a></p></body></html>')
-open('index.html', 'w', encoding='utf8').write(conv(pt, 'Política de privacidade do Numeri', 'pt-BR', f'Última atualização: {date}'))
-open('es.html', 'w', encoding='utf8').write(conv(es, 'Política de privacidad de Numeri', 'es', f'Última actualización: {date}'))
+open('public/index.html', 'w', encoding='utf8').write(conv(pt, 'Política de privacidade do Numeri', 'pt-BR', f'Última atualização: {date}'))
+open('public/es.html', 'w', encoding='utf8').write(conv(es, 'Política de privacidad de Numeri', 'es', f'Última actualización: {date}'))
