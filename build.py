@@ -1,10 +1,10 @@
-# Gera index.html (pt) e es.html a partir de docs/politica-de-privacidade.md do repositório numeri.
+# Gera index.html (pt), es.html e en.html a partir de docs/politica-de-privacidade.md do repositório numeri.
 import re, html, sys
 SRC = sys.argv[1] if len(sys.argv) > 1 else '../numeri/docs/politica-de-privacidade.md'
 src = open(SRC, encoding='utf8').read()
 # Versão pública: sem afirmar o que ainda não é verdade (hospedagem e bloqueio no AdMob); ver backlog.
 for a, b in [
-    (r' (?:e bloqueamos categorias sensíveis|y bloqueamos categorías sensibles) \[PEND[^\]]*\]', ''),
+    (r' (?:e bloqueamos categorias sensíveis|y bloqueamos categorías sensibles|and block sensitive categories)\s+\[PEND[^\]]*\]', ''),
     (r'Os servidores ficam em \[PEND[^\]]*\]\. ', ''),
     (r'Los servidores están en \[PEND[^\]]*\]\. ', ''),
     (r' \[PEND[^\]]*\]', ''),
@@ -12,8 +12,9 @@ for a, b in [
     src = re.sub(a, b, src)
 date = re.search(r'Última atualização: (.*)', src).group(1)
 pt = src.split('## Português')[1].split('\n---\n')[0]
-es = src.split('## Español')[1]
-assert not re.search(r'PEND|CONFERIR', pt + es), 'ainda há trecho pendente'
+es = src.split('## Español')[1].split('\n---\n')[0]
+en = src.split('## English')[1]
+assert not re.search(r'PEND|CONFERIR', pt + es + en), 'ainda há trecho pendente'
 def inline(t):
     t = html.escape(t)
     t = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', t)
@@ -35,12 +36,13 @@ def conv(md, title, lang, upd):
         elif l.startswith('- '): fp(); li.append([l[2:]])
         elif l.startswith('  ') and li: li[-1].append(l.strip())
         elif not l.strip(): fp(); fl()
-        elif l.startswith('Última a'): fp(); fl()
+        elif l.startswith(('Última a', 'Last updated')): fp(); fl()
         else: fl(); para.append(l.strip())
     fp(); fl()
     return (f'<!doctype html>\n<html lang="{lang}"><head><meta charset="utf-8">\n'
             f'<meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>\n'
             f'<style>{CSS}</style></head>\n<body><h1>{title}</h1>{"".join(out)}'
-            '<p><a href="./">Português</a> · <a href="es.html">Español</a></p></body></html>')
+            '<p><a href="./">Português</a> · <a href="es.html">Español</a> · <a href="en.html">English</a></p></body></html>')
 open('public/index.html', 'w', encoding='utf8').write(conv(pt, 'Política de privacidade do Numeri', 'pt-BR', f'Última atualização: {date}'))
 open('public/es.html', 'w', encoding='utf8').write(conv(es, 'Política de privacidad de Numeri', 'es', f'Última actualización: {date}'))
+open('public/en.html', 'w', encoding='utf8').write(conv(en, 'Numeri privacy policy', 'en', f'Last updated: {date}'))
